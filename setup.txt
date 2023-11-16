@@ -1,0 +1,54 @@
+--- DISCOVERY SERVER---
+
+1- pom.xml
+
+    Bu bağımlılık, Netflix tarafından geliştirilen Eureka isimli bir hizmet keşif (service discovery)
+    sunucusunu entegre etmenizi sağlar.Eureka Server, bir servisin kaydedildiği (register) ve başka bir
+    servisin bu kayıtları sorgulayarak diğer servisi bulduğu (discovery) bir sistem sağlar.
+    Bu, servislerin IP adresleri veya bağlantı noktaları gibi detaylara doğrudan bağlı kalmadan birbirleriyle
+    iletişim kurabilmelerini sağlar:
+
+    	<dependency>
+    		<groupId>org.springframework.cloud</groupId>
+    		<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+    	</dependency>
+
+2 - application.java
+
+        @SpringBootApplication
+        @EnableEurekaServer  <--- Eureka Server'ı aktif hale getiriyoruz
+        public class DiscoveryServerApplication {
+
+        	public static void main(String[] args) {
+        		SpringApplication.run(DiscoveryServerApplication.class, args);
+        	}
+
+        }
+
+3 - application.properties
+
+        eureka.instance.hostname=localhost <--- Eureka Server'a kaydedilen servislerin hostname'larını belirtir
+        eureka.client.register-with-eureka=false <--- Eureka Server örneğinin kendisini Eureka Server'a kaydedip kaydetmeyeceğini belirler. "false" değeri, bu Eureka Server'ın kendi kendini kaydetmeyeceği anlamına gelir
+        eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/  <--- Eureka Server'ın kendisini kaydettiği (register) veya diğer servislerin kayıtlarını sorguladığı (discovery) Eureka Server'ın URL'sini belirtir
+        eureka.client.fetch-registry=false <--- "false" değeri, bu Eureka Server'ın diğer servislerin kayıtlarını almaya çalışmayacağı anlamına gelir
+        server.port=8761 <---  Eureka Server 8761 numaralı port üzerinde çalışacaktır.
+
+--- CAR SERVICE ---
+
+        pring Boot tabanlı bir mikro servis uygulamasını
+        Eureka Server'a kaydetmek ve diğer servisleri Eureka Server üzerinden keşfetmek için kullanılır:
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            </dependency>
+
+--- RENTAL SERVICE ---
+
+        pring Boot tabanlı bir mikro servis uygulamasını
+        Eureka Server'a kaydetmek ve diğer servisleri Eureka Server üzerinden keşfetmek için kullanılır:
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            </dependency>
