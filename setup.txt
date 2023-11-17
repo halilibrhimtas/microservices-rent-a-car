@@ -2,7 +2,7 @@
 
 1- pom.xml
 
-    Bu bağımlılık, Netflix tarafından geliştirilen Eureka isimli bir hizmet keşif (service discovery)
+   Bu bağımlılık, Netflix tarafından geliştirilen Eureka isimli bir hizmet keşif (service discovery)
     sunucusunu entegre etmenizi sağlar.Eureka Server, bir servisin kaydedildiği (register) ve başka bir
     servisin bu kayıtları sorgulayarak diğer servisi bulduğu (discovery) bir sistem sağlar.
     Bu, servislerin IP adresleri veya bağlantı noktaları gibi detaylara doğrudan bağlı kalmadan birbirleriyle
