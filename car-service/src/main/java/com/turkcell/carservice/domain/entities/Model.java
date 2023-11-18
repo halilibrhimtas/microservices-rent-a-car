@@ -8,6 +8,7 @@ import nonapi.io.github.classgraph.json.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,7 +20,5 @@ public class Model {
     @Id
     private String id;
     private String name;
-    private Brand brand;
-    private List<Car> cars;
-
+    private String brandId;
 }

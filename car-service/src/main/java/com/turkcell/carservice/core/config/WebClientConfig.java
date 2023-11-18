@@ -1,4 +1,4 @@
-package com.turkcell.carservice.config;
+package com.turkcell.carservice.core.config;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;

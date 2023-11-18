@@ -1,4 +1,4 @@
-package com.turkcell.carservice.business.services;
+package com.turkcell.carservice.business.abstracts;
 
 import com.turkcell.carservice.domain.dtos.requests.model.CreateModelRequest;
 import com.turkcell.carservice.domain.dtos.requests.model.UpdateModelRequest;
@@ -8,6 +8,7 @@ import com.turkcell.carservice.domain.dtos.responses.model.GetModelResponse;
 import com.turkcell.carservice.domain.dtos.responses.model.UpdateModelResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ModelService {
     List<GetAllModelResponse> getAll();

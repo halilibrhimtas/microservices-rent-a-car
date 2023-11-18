@@ -1,4 +1,4 @@
-package com.turkcell.carservice.business.services;
+package com.turkcell.carservice.business.abstracts;
 
 import com.turkcell.carservice.domain.dtos.requests.car.CreateCarRequest;
 import com.turkcell.carservice.domain.dtos.requests.car.UpdateCarRequest;
@@ -8,11 +8,12 @@ import com.turkcell.carservice.domain.dtos.responses.car.GetCarResponse;
 import com.turkcell.carservice.domain.dtos.responses.car.UpdateCarResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface CarService {
     List<GetAllCarResponse> getAll();
     GetCarResponse getById(String id);
-    CreateCarResponse create(CreateCarRequest carRequest);
+    CreateCarResponse add(CreateCarRequest carRequest);
     UpdateCarResponse update(String id, UpdateCarRequest carRequest);
     void delete(String id);
 }
