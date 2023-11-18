@@ -1,10 +1,12 @@
 package com.turkcell.carservice.repository;
 
-import com.turkcell.carservice.entities.Brand;
+import com.turkcell.carservice.domain.entities.Brand;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.UUID;
 
+@Repository
 public interface BrandRepository extends MongoRepository<Brand, String> {
-    Optional<Brand> findByBrandName(String name);
+   // Brand findBrandById(String id);
 }

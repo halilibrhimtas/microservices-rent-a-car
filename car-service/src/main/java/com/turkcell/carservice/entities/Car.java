@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import nonapi.io.github.classgraph.json.Id;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
@@ -19,6 +20,8 @@ import java.util.UUID;
 public class Car {
     @Id
     private String id;
+
+    @Id
     private String modelId;
     private int modelYear;
     private double dailyPrice;
