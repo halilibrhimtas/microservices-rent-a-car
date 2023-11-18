@@ -1,6 +1,4 @@
---- DISCOVERY SERVER---
-
-1- pom.xml
+    --- DISCOVERY SERVER--- pom.xml
 
    Bu bağımlılık, Netflix tarafından geliştirilen Eureka isimli bir hizmet keşif (service discovery)
     sunucusunu entegre etmenizi sağlar.Eureka Server, bir servisin kaydedildiği (register) ve başka bir
@@ -13,7 +11,8 @@
     		<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
     	</dependency>
 
-2 - application.java
+
+    --- DISCOVERY SERVER--- application.java
 
         @SpringBootApplication
         @EnableEurekaServer  <--- Eureka Server'ı aktif hale getiriyoruz
@@ -25,7 +24,9 @@
 
         }
 
-3 - application.properties
+
+
+      --- DISCOVERY SERVER--- application.properties
 
         eureka.instance.hostname=localhost <--- Eureka Server'a kaydedilen servislerin hostname'larını belirtir
         eureka.client.register-with-eureka=false <--- Eureka Server örneğinin kendisini Eureka Server'a kaydedip kaydetmeyeceğini belirler. "false" değeri, bu Eureka Server'ın kendi kendini kaydetmeyeceği anlamına gelir
@@ -33,7 +34,7 @@
         eureka.client.fetch-registry=false <--- "false" değeri, bu Eureka Server'ın diğer servislerin kayıtlarını almaya çalışmayacağı anlamına gelir
         server.port=8761 <---  Eureka Server 8761 numaralı port üzerinde çalışacaktır.
 
---- CAR SERVICE ---
+      --- CAR SERVICE --- pom.xml
 
         pring Boot tabanlı bir mikro servis uygulamasını
         Eureka Server'a kaydetmek ve diğer servisleri Eureka Server üzerinden keşfetmek için kullanılır:
@@ -43,7 +44,7 @@
                 <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
             </dependency>
 
---- RENTAL SERVICE ---
+        --- RENTAL SERVICE --- pom.xml
 
         pring Boot tabanlı bir mikro servis uygulamasını
         Eureka Server'a kaydetmek ve diğer servisleri Eureka Server üzerinden keşfetmek için kullanılır:
@@ -52,3 +53,151 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
             </dependency>
+
+        --- CAR SERVICE ---  application.properties
+
+        eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka
+        spring.application.name=car-service
+        management.endpoints.web.exposure.include=info
+
+        --- RENTAL SERVICE ---  application.properties
+
+        eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka
+        spring.application.name=rental-service
+        management.endpoints.web.exposure.include=info
+
+
+---> Projemize Entities ve DTO'ları ekliyoruz. DTO'lar request ve response şeklinde ikiye ayrılmıştır.
+
+    Car.java
+
+    @AllArgsConstructor <--  Bütün alanları içeren bir parametreli constructor ekler
+    @NoArgsConstructor <--  Parametresiz bir constructor ekler.
+    @Builder <-- Builder deseni kullanarak nesne oluşturmayı sağlayan bir builder sınıfı oluşturur
+    @Data <-- Getter ve Setter işlemlerini yapmamızı sağlar
+    @Document(value = "cars") <-- MongoDB'de cars collection içerisine kaydediliyor
+    public class Car {
+        @Id
+        private String id;
+        private String modelId;
+        private Date modelYear;
+        private double dailyPrice;
+        private String color;
+        private String plate;  <-- DTO'larda regex ile plaka formatında veri alınıyor.
+        //private List<String> imagesUrls;
+    }
+
+
+---> Ardından business/abstracts altında BrandService, CarService, ModelService'ler oluşturuldu.
+
+        public interface CarService {
+            List<GetAllCarResponse> getAll();
+            GetCarResponse getById(String id);
+            CreateCarResponse create(CreateCarRequest carRequest);
+            UpdateCarResponse update(String id, UpdateCarRequest carRequest);
+            void delete(String id);
+        }
+
+        public interface BrandService {
+            List<GetAllBrandResponse> getAll();
+            GetBrandResponse getById(String id);
+            CreateBrandResponse add(CreateBrandRequest request);
+            UpdateBrandResponse update(String id, UpdateBrandRequest request);
+            void delete(String id);
+        }
+
+        public interface ModelService {
+            List<GetAllModelResponse> getAll();
+            GetModelResponse getById(String id);
+            CreateModelResponse add(CreateModelRequest request);
+            UpdateModelResponse update(String id, UpdateModelRequest request);
+            void delete(String id);
+        }
+
+
+---> Projemizde business/conceretes altında BrandManager, CarManager, ModelManager dosyalarını ekledik.
+
+     Bu manager dosyaları servislerden implement olarak, ordaki methodları içermektedir.
+
+---> Veritabanı ile ilgili işlemleri gerçekleştireceğimiz repository'leri oluşturuyoruz.
+     Bu repository'lerde veritabanı olarak MongoDB kullandığımız için MongoRepository'den extends olacak.
+
+     public interface BrandRepository extends MongoRepository<Brand, String> {
+
+     }
+
+     public interface CarRepository extends MongoRepository<Car, String> {
+
+     }
+
+     public interface ModelRepository extends MongoRepository<Model, String> {
+
+     }
+
+--> Manager kısmına geçmeden önce Exception dosyalarımızı oluşturalım.
+
+    core/exceptions:
+
+        @RestControllerAdvice
+        public class GlobalExceptionHandlers {
+            @ExceptionHandler({ MethodArgumentNotValidException.class }) <-- HTTP isteğinin belirli bir metodu çağırırken parametre doğrulama hatası olması
+            public List<String> handleValidationException(MethodArgumentNotValidException ex){
+                List<String> errors = new ArrayList<>();
+                ex.getBindingResult().getAllErrors().forEach((error) -> {
+                    String fieldName = ((FieldError)error).getField();
+                    String errorMessage = error.getDefaultMessage();
+                    String message = fieldName + ":" + errorMessage;
+                    errors.add(message);
+                });
+                return errors;
+            }
+
+            @ExceptionHandler({BusinessException.class})
+            @ResponseStatus(HttpStatus.BAD_REQUEST)
+            public String handleBusinessException(BusinessException ex){ <-- Uygulama içinde ortaya çıkabilecek özel iş hataları için
+                return ex.getMessage();
+            }
+        }
+
+    business/exceptions:  --> Business işlemlerinde ortaya çıkan belirli bir durumu temsil eden hataları ifade etmek içindir
+
+        public class BusinessException extends RuntimeException{
+
+            public BusinessException(String message) {
+                super(message);
+            }
+        }
+
+--> Manager Dosyaları
+
+    Model Mapper:
+        Model mapper kütüphanesi sayesinde,
+        modeller arasında dönüşümlerde haritalandırmayı manuel olarak değil, otomatik yapıyoruz.
+
+    pom.xml
+
+        <dependency>
+        	<groupId>org.modelmapper</groupId>
+        	<artifactId>modelmapper</artifactId>
+        	<version>3.1.1</version>
+        </dependency
+
+    core/config:
+
+        ModelMapperConfiguration.java
+
+            public class ModelMapperConfiguration {
+                @Bean <-- Tüm uygulamada ModelMapper methodunu kullanmamızı sağlıyor
+                public ModelMapper modelMapper(){
+                    var mapper =  new ModelMapper();
+                    mapper.getConfiguration()
+                    .setAmbiguityIgnored(true) <-- model eşleştirmesi sırasında belirsizlik durumlarını görmezden
+                    .setMatchingStrategy(MatchingStrategies.STRICT);
+                    return mapper;
+                }
+            }
+
+
+    --- CAR MANAGER ---
+
+

@@ -1,8 +1,10 @@
 package com.turkcell.carservice.repository;
 
-import com.turkcell.carservice.domain.entities.Car;
+import com.turkcell.carservice.entities.Car;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface CarRepository extends MongoRepository<Car, String> {
+import java.util.Optional;
 
+public interface CarRepository extends MongoRepository<Car, String> {
+    Optional<Car> findByPlate(String plate);
 }
