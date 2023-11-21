@@ -243,3 +243,11 @@ api-gateway:
     maven clean - install
     docker build -t halilibrahimtas/api-gateway .
     docker push halilibrahimtas/api-gateway
+
+
+rental-service - error:
+
+    Please refer to C:\Microservices\clone-rent-a-car\microservices-rent-a-car-clone\rental-service\target\surefire-reports for the individual test results.
+    Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+
+    pom.xml - plugins:
