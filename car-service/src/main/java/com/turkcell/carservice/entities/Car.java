@@ -20,12 +20,11 @@ import java.util.UUID;
 public class Car {
     @Id
     private String id;
-
-    @Id
     private String modelId;
     private int modelYear;
     private double dailyPrice;
     private String color;
     private String plate;
+    private boolean isAvailable;
     //private List<String> imagesUrls;
 }

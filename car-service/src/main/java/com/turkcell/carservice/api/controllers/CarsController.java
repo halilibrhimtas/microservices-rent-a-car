@@ -44,7 +44,10 @@ public class CarsController {
     public UpdateCarResponse updateCarDto(@RequestParam("id") String id, @Valid @RequestBody UpdateCarRequest updateCarRequest) {
         return carService.update(id, updateCarRequest);
     }
-
+    @GetMapping("/check-car")
+    public Boolean checkCar(@RequestParam("id") String carId) {
+        return carService.checkCar(carId);
+    }
     @DeleteMapping("/delete")
     public void delete(@RequestParam("id") String id) {
         carService.delete(id);

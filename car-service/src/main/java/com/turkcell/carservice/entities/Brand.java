@@ -1,4 +1,4 @@
-package com.turkcell.carservice.domain.entities;
+package com.turkcell.carservice.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import nonapi.io.github.classgraph.json.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor

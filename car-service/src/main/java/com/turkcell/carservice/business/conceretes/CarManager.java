@@ -1,7 +1,6 @@
 package com.turkcell.carservice.business.conceretes;
 
 import com.turkcell.carservice.business.abstracts.CarService;
-import com.turkcell.carservice.business.rules.BrandsBusinessRules;
 import com.turkcell.carservice.business.rules.CarBusinessRules;
 import com.turkcell.carservice.business.rules.ModelBusinessRules;
 import com.turkcell.carservice.business.dtos.requests.car.CreateCarRequest;
@@ -18,10 +17,11 @@ import com.turkcell.carservice.repository.CarRepository;
 import com.turkcell.carservice.repository.ModelRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +31,9 @@ public class CarManager implements CarService {
     private final ModelRepository modelRepository;
     private final BrandRepository brandRepository;
     private final ModelMapper modelMapper;
-    private final MessageSource messageSource;
-    private final BrandsBusinessRules brandsBusinessRules;
     private final ModelBusinessRules modelBusinessRules;
     private final CarBusinessRules carBusinessRules;
+    private final WebClient.Builder webClientBuilder;
 
     @Override
     public List<GetAllCarResponse> getAll() {
@@ -42,6 +41,14 @@ public class CarManager implements CarService {
         List<GetAllCarResponse> allCarResponses = cars.stream().map(car -> {
             Model model = modelRepository.findById(car.getModelId()).orElseThrow();
             Brand brand = brandRepository.findById(model.getBrandId()).orElseThrow();
+            Boolean isAvailable = webClientBuilder.build()
+                    .get()
+                    .uri("http://rental-service/api/rentals/check-car-available",
+                            (uriBuilder) -> uriBuilder
+                                    .queryParam("carId", car.getId()).build())
+                    .retrieve()
+                    .bodyToMono(Boolean.class)
+                    .block();
             return GetAllCarResponse
                     .builder()
                     .id(car.getId())
@@ -49,6 +56,7 @@ public class CarManager implements CarService {
                     .model(model)
                     .plate(car.getPlate())
                     .color(car.getColor())
+                    .isAvailable(isAvailable)
                     .dailyPrice(car.getDailyPrice())
                     .modelYear(car.getModelYear())
                     .build();
@@ -61,6 +69,14 @@ public class CarManager implements CarService {
         Car car = carRepository.findById(id).orElseThrow();
         Model model = modelRepository.findById(car.getModelId()).orElseThrow();
         Brand brand = brandRepository.findById(model.getBrandId()).orElseThrow();
+        Boolean isAvailable = webClientBuilder.build()
+                .get()
+                .uri("http://rental-service/api/rentals/check-car-available",
+                        (uriBuilder) -> uriBuilder
+                                .queryParam("carId", car.getId()).build())
+                .retrieve()
+                .bodyToMono(Boolean.class)
+                .block();
         //return modelMapper.map(car, GetCarResponse.class);
         return  GetCarResponse
                 .builder()
@@ -69,6 +85,7 @@ public class CarManager implements CarService {
                 .model(model)
                 .plate(car.getPlate())
                 .color(car.getColor())
+                .isAvailable(isAvailable)
                 .dailyPrice(car.getDailyPrice())
                 .modelYear(car.getModelYear())
                 .build();
@@ -104,6 +121,12 @@ public class CarManager implements CarService {
                 .build();
         carRepository.save(car);
         return modelMapper.map(car, UpdateCarResponse.class);
+    }
+
+    @Override
+    public boolean checkCar(String carId) {
+        Optional<Car> car = carRepository.findById(carId);
+        return car.isPresent();
     }
 
     @Override

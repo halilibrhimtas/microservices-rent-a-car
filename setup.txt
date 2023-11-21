@@ -201,3 +201,45 @@
     --- CAR MANAGER ---
 
 
+CREATE TABLE rentals (
+    id UUID PRIMARY KEY,
+    car_id VARCHAR(255) NOT NULL,
+    started_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+    is_rented_completed BOOLEAN NOT NULL
+);
+
+
+--- FEIGN CLIENT ---
+
+Feign Nedir?
+
+    Feign, Spring Cloud tarafından desteklenen bir HTTP istemci kütüphanesidir ve
+    mikroservis mimarilerinde servisler arası iletişimi kolaylaştırmak için kullanılmaktadır.
+
+    pom.xml: (Rental ve Car Service)
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+car-service:
+    maven clean - install
+    docker build -t halilibrahimtas/car-service .
+    docker push halilibrahimtas/car-service
+
+discovery-server:
+    maven clean - install
+    docker build -t halilibrahimtas/discovery-server .
+    docker push halilibrahimtas/discovery-server
+
+rental-service:
+    maven clean - install
+    docker build -t halilibrahimtas/rental-service .
+    docker push halilibrahimtas/rental-service
+
+api-gateway:
+    maven clean - install
+    docker build -t halilibrahimtas/api-gateway .
+    docker push halilibrahimtas/api-gateway

@@ -1,0 +1,65 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak
+    ports:
+      - "8080:8080"
+    mem_limit: 700m
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command:
+      - start-dev
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+
+  postgresql:
+    image: postgres:alpine
+    container_name: postgresql
+    restart: always
+    ports:
+      - "5432:5432"
+
+  api-gateway:
+    image: halilibrahimtas/api-gateway
+    ports:
+      - "8181:8181"
+    depends_on:
+      - car-service
+      - rental-service
+      - discovery-server
+
+  car-service:
+    image: halilibrahimtas/car-service
+    ports:
+      - "6005:6005"
+    depends_on:
+      - discovery-server
+    networks:
+      - backend
+
+  discovery-server:
+    image: halilibrahimtas/discovery-server
+    ports:
+      - "8761:8761"
+    networks:
+      - backend
+
+  rental-service:
+    image: halilibrahimtas/rental-service
+    ports:
+      - "7005:7005"
+    depends_on:
+      - discovery-server
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

@@ -19,6 +19,7 @@ public class GetCarResponse {
     private double dailyPrice;
     private String color;
     private String plate;
+    private boolean isAvailable;
     //private String plate;
     //private List<String> imagesUrls;
 }

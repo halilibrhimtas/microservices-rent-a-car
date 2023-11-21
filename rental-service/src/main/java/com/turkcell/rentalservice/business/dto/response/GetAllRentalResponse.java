@@ -1,0 +1,21 @@
+package com.turkcell.rentalservice.business.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
+import java.util.UUID;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+public class GetAllRentalResponse {
+    private UUID id;
+    private String carId;
+    private Date startedDate;
+    private Date endDate;
+    private boolean isRentedCompleted;
+}

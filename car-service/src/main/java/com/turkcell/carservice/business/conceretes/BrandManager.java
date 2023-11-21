@@ -8,9 +8,9 @@ import com.turkcell.carservice.business.dtos.responses.brand.CreateBrandResponse
 import com.turkcell.carservice.business.dtos.responses.brand.GetAllBrandResponse;
 import com.turkcell.carservice.business.dtos.responses.brand.GetBrandResponse;
 import com.turkcell.carservice.business.dtos.responses.brand.UpdateBrandResponse;
+import com.turkcell.carservice.entities.Brand;
 import com.turkcell.carservice.repository.BrandRepository;
 import lombok.RequiredArgsConstructor;
-import com.turkcell.carservice.domain.entities.Brand;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
