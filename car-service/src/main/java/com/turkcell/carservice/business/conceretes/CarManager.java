@@ -1,7 +1,11 @@
 package com.turkcell.carservice.business.conceretes;
 
 import com.turkcell.carservice.business.abstracts.CarService;
+import com.turkcell.carservice.business.dtos.requests.carImages.CreateCarImagesRequest;
+import com.turkcell.carservice.business.dtos.requests.carImages.UpdateCarImagesRequest;
+import com.turkcell.carservice.business.rules.BrandsBusinessRules;
 import com.turkcell.carservice.business.rules.CarBusinessRules;
+import com.turkcell.carservice.business.rules.CarImagesBusinessRules;
 import com.turkcell.carservice.business.rules.ModelBusinessRules;
 import com.turkcell.carservice.business.dtos.requests.car.CreateCarRequest;
 import com.turkcell.carservice.business.dtos.requests.car.UpdateCarRequest;
@@ -9,10 +13,13 @@ import com.turkcell.carservice.business.dtos.responses.car.CreateCarResponse;
 import com.turkcell.carservice.business.dtos.responses.car.GetAllCarResponse;
 import com.turkcell.carservice.business.dtos.responses.car.GetCarResponse;
 import com.turkcell.carservice.business.dtos.responses.car.UpdateCarResponse;
+import com.turkcell.carservice.cloudinary.CloudinaryUploader;
 import com.turkcell.carservice.entities.Brand;
 import com.turkcell.carservice.entities.Car;
+import com.turkcell.carservice.entities.CarImages;
 import com.turkcell.carservice.entities.Model;
 import com.turkcell.carservice.repository.BrandRepository;
+import com.turkcell.carservice.repository.CarImagesRepository;
 import com.turkcell.carservice.repository.CarRepository;
 import com.turkcell.carservice.repository.ModelRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +27,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,13 +43,21 @@ public class CarManager implements CarService {
     private final ModelBusinessRules modelBusinessRules;
     private final CarBusinessRules carBusinessRules;
     private final WebClient.Builder webClientBuilder;
+    private final CloudinaryUploader cloudinaryUploader;
+    private final CarImagesRepository carImagesRepository;
+    private final CarImagesBusinessRules carImagesBusinessRules;
+    private final BrandsBusinessRules brandsBusinessRules;
 
     @Override
     public List<GetAllCarResponse> getAll() {
         List<Car> cars = carRepository.findAll();
         List<GetAllCarResponse> allCarResponses = cars.stream().map(car -> {
+            modelBusinessRules.isExistModel(car.getModelId());
             Model model = modelRepository.findById(car.getModelId()).orElseThrow();
+            brandsBusinessRules.isExistBrand(model.getBrandId());
             Brand brand = brandRepository.findById(model.getBrandId()).orElseThrow();
+            carImagesBusinessRules.isExistCarImages(car.getId());
+            CarImages carImages = getCarImagesByCarId(car.getId());
             Boolean isAvailable = webClientBuilder.build()
                     .get()
                     .uri("http://rental-service/api/rentals/check-car-available",
@@ -57,6 +74,7 @@ public class CarManager implements CarService {
                     .plate(car.getPlate())
                     .color(car.getColor())
                     .isAvailable(isAvailable)
+                    .images(carImages.getImages())
                     .dailyPrice(car.getDailyPrice())
                     .modelYear(car.getModelYear())
                     .build();
@@ -67,8 +85,12 @@ public class CarManager implements CarService {
     @Override
     public GetCarResponse getById(String id) {
         Car car = carRepository.findById(id).orElseThrow();
+        modelBusinessRules.isExistModel(car.getModelId());
         Model model = modelRepository.findById(car.getModelId()).orElseThrow();
+        brandsBusinessRules.isExistBrand(model.getBrandId());
         Brand brand = brandRepository.findById(model.getBrandId()).orElseThrow();
+        carImagesBusinessRules.isExistCarImages(car.getId());
+        CarImages carImages = getCarImagesByCarId(car.getId());
         Boolean isAvailable = webClientBuilder.build()
                 .get()
                 .uri("http://rental-service/api/rentals/check-car-available",
@@ -86,13 +108,14 @@ public class CarManager implements CarService {
                 .plate(car.getPlate())
                 .color(car.getColor())
                 .isAvailable(isAvailable)
+                .images(carImages.getImages())
                 .dailyPrice(car.getDailyPrice())
                 .modelYear(car.getModelYear())
                 .build();
     }
 
     @Override
-    public CreateCarResponse add(CreateCarRequest carRequest) {
+    public CreateCarResponse add(CreateCarRequest carRequest) throws IOException {
         //Car car = modelMapper.map(carRequest, Car.class);
         carBusinessRules.isNotSamePlate(carRequest.getPlate());
         modelBusinessRules.isExistModel(carRequest.getModelId());
@@ -103,14 +126,23 @@ public class CarManager implements CarService {
                 .plate(carRequest.getPlate())
                 .dailyPrice(carRequest.getDailyPrice())
                 .build();
-        carRepository.save(car);
-        return modelMapper.map(car, CreateCarResponse.class);
+        Car createdCAr = carRepository.save(car);
+        String carID = createdCAr.getId();
+        CarImages carImages = saveCarImages(carID, carRequest.getImages());;
+        return CreateCarResponse
+                .builder()
+                .id(createdCAr.getId())
+                .color(createdCAr.getColor())
+                .modelYear(createdCAr.getModelYear())
+                .dailyPrice(createdCAr.getDailyPrice())
+                .plate(createdCAr.getPlate())
+                .images(carImages.getImages())
+                .build();
     }
 
     @Override
-    public UpdateCarResponse update(String id, UpdateCarRequest carRequest) {
+    public UpdateCarResponse update(String id, UpdateCarRequest carRequest) throws IOException{
         modelBusinessRules.isExistModel(carRequest.getModelId());
-        //Car car = modelMapper.map(carRequest, Car.class);
         Car car = Car.builder()
                 .id(id)
                 .modelId(carRequest.getModelId())
@@ -119,8 +151,18 @@ public class CarManager implements CarService {
                 .plate(carRequest.getPlate())
                 .dailyPrice(carRequest.getDailyPrice())
                 .build();
-        carRepository.save(car);
-        return modelMapper.map(car, UpdateCarResponse.class);
+        Car createdCAr = carRepository.save(car);
+        String carID = createdCAr.getId();
+        CarImages carImages = updateCarImages(carID, carRequest.getImages());
+        return UpdateCarResponse
+                .builder()
+                .id(createdCAr.getId())
+                .color(createdCAr.getColor())
+                .dailyPrice(createdCAr.getDailyPrice())
+                .plate(createdCAr.getPlate())
+                .modelYear(createdCAr.getModelYear())
+                .images(carImages.getImages())
+                .build();
     }
 
     @Override
@@ -130,8 +172,42 @@ public class CarManager implements CarService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(String id) throws IOException {
         carBusinessRules.isExistCar(id);
+        deleteCarImages(id);
         carRepository.deleteById(id);
     }
+
+    public CarImages saveCarImages(String carId, List<String> images) throws IOException {
+        carImagesBusinessRules.isExistCarImages(carId);
+        List<String> imagesUrlList = new ArrayList<>();
+        for (String image: images) {
+            String imageUrl = cloudinaryUploader.uploadBase64Image(image);
+            imagesUrlList.add(imageUrl);
+        }
+        CarImages carImages = CarImages.builder().carId(carId).images(imagesUrlList).build();
+        return carImagesRepository.save(carImages);
+    }
+
+    public CarImages updateCarImages(String carId, List<String> images) throws IOException {
+        carImagesBusinessRules.isExistCarImages(carId);
+        List<String> imagesUrlList = new ArrayList<>();
+        for (String image: images) {
+            String imageUrl = cloudinaryUploader.uploadBase64Image(image);
+            imagesUrlList.add(imageUrl);
+        }
+        CarImages carImages = CarImages.builder().carId(carId).images(imagesUrlList).build();
+        return carImagesRepository.save(carImages);
+    }
+
+    public void deleteCarImages(String carId) throws IOException {
+        carImagesBusinessRules.isExistCarImages(carId);
+        carImagesRepository.deleteByCarId(carId);
+    }
+
+    CarImages getCarImagesByCarId (String carId) {
+        carImagesBusinessRules.isExistCarImages(carId);
+        return carImagesRepository.findByCarId(carId);
+    }
+
 }

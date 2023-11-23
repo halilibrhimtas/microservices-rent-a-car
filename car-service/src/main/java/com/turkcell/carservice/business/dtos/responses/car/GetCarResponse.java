@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,5 +23,5 @@ public class GetCarResponse {
     private String plate;
     private boolean isAvailable;
     //private String plate;
-    //private List<String> imagesUrls;
+    private List<String> images;
 }

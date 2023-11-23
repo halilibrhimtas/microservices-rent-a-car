@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -36,12 +37,12 @@ public class CarsController {
     } */
 
     @PostMapping("/add")
-    public CreateCarResponse addCarDto(@RequestBody @Valid CreateCarRequest createCarRequest) {
+    public CreateCarResponse addCarDto(@RequestBody @Valid CreateCarRequest createCarRequest) throws IOException {
         return carService.add(createCarRequest);
     }
 
     @PutMapping("/update")
-    public UpdateCarResponse updateCarDto(@RequestParam("id") String id, @Valid @RequestBody UpdateCarRequest updateCarRequest) {
+    public UpdateCarResponse updateCarDto(@RequestParam("id") String id, @Valid @RequestBody UpdateCarRequest updateCarRequest) throws IOException {
         return carService.update(id, updateCarRequest);
     }
     @GetMapping("/check-car")
@@ -49,7 +50,7 @@ public class CarsController {
         return carService.checkCar(carId);
     }
     @DeleteMapping("/delete")
-    public void delete(@RequestParam("id") String id) {
+    public void delete(@RequestParam("id") String id) throws IOException {
         carService.delete(id);
     }
 }

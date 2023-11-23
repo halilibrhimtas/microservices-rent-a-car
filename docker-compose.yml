@@ -9,6 +9,8 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
     command:
       - start-dev
+    networks:
+      - backend
 
   discovery-server:
     image: halilibrahimtas/discovery-server
@@ -17,6 +19,8 @@ services:
     mem_limit: 700m
     depends_on:
       - keycloak
+    networks:
+      - backend
 
   api-gateway:
     image: halilibrahimtas/api-gateway
@@ -25,6 +29,30 @@ services:
     mem_limit: 700m
     depends_on:
       - discovery-server
+    networks:
+      - backend
+
+  car-service:
+    image: halilibrahimtas/car-service
+    ports:
+      - 6005:6005
+    mem_limit: 700m
+    depends_on:
+      - discovery-server
+      - api-gateway
+    networks:
+      - backend
+
+  rental-service:
+    image: halilibrahimtas/rental-service
+    ports:
+      - 7005:7005
+    mem_limit: 700m
+    depends_on:
+      - discovery-server
+      - api-gateway
+    networks:
+      - backend
 
   mongo:
     image: mongo:latest
@@ -34,6 +62,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - backend
 
   postgresql:
     image: postgres:latest
@@ -44,6 +74,8 @@ services:
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: rentals
+    networks:
+      - backend
 
 networks:
   backend:

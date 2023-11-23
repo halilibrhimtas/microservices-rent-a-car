@@ -26,5 +26,5 @@ public class Car {
     private String color;
     private String plate;
     private boolean isAvailable;
-    //private List<String> imagesUrls;
+    private List<String> images;
 }

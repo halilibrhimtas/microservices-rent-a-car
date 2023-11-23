@@ -251,3 +251,12 @@ rental-service - error:
     Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
 
     pom.xml - plugins:
+
+
+---CLOUDINARY---
+
+    <dependency>
+        <groupId>com.cloudinary</groupId>
+        <artifactId>cloudinary-http44</artifactId>
+        <version>1.27.0</version>
+    </dependency>

@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -29,5 +31,5 @@ public class CreateCarRequest {
     @Min(0)
     private double dailyPrice;
 
-    //private List<String> imagesUrls;
+    private List<String> images;
 }

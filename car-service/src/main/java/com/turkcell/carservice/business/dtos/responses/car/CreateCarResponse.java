@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,6 +17,6 @@ public class CreateCarResponse {
     private int modelYear;
     private double dailyPrice;
     private String color;
-    //private String plate;
-    //private List<String> imagesUrls;
+    private String plate;
+    private List<String> images;
 }

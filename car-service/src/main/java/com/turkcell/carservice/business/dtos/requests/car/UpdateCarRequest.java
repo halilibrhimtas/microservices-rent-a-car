@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -33,4 +35,6 @@ public class UpdateCarRequest {
 
     @Pattern(regexp = Regex.Plate, message = "Türkiye plakası olmalıdır.")
     private String plate;
+
+    private List<String> images;
 }
