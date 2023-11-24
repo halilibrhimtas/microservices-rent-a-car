@@ -9,6 +9,7 @@ import com.turkcell.carservice.business.dtos.responses.car.GetCarResponse;
 import com.turkcell.carservice.business.dtos.responses.car.UpdateCarResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -21,7 +22,8 @@ public class CarsController {
     private final CarService carService;
 
     @GetMapping
-    public List<GetAllCarResponse> getAll(){
+    public List<GetAllCarResponse> getAll(Model model){
+        model.addAttribute("cars", carService.getAll());
         return carService.getAll();
     }
 

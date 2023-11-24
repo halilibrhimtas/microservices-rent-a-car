@@ -18,8 +18,8 @@ public class CarImagesBusinessRules {
     private final MessageSource messageSource;
 
     public void isExistCarImages(String carId) {
-        CarImages carImages = carImagesRepository.findByCarId(carId);
-        if(carImages == null){
+        CarImages carImages = carImagesRepository.findCarImagesByCarId(carId);
+        if(carImages != null){
             throw new BusinessException(messageSource.getMessage("isExistCarImages", new Object[] {carId}, LocaleContextHolder.getLocale()));
         }
     }

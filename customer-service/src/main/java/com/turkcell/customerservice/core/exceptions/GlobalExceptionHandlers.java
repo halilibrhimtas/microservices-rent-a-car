@@ -1,6 +1,6 @@
 package com.turkcell.customerservice.core.exceptions;
 
-import com.turkcell.carservice.business.exceptions.BusinessException;
+import com.turkcell.customerservice.business.exceptions.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;

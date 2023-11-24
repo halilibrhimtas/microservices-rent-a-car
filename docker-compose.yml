@@ -12,48 +12,6 @@ services:
     networks:
       - backend
 
-  discovery-server:
-    image: halilibrahimtas/discovery-server
-    ports:
-      - 8761:8761
-    mem_limit: 700m
-    depends_on:
-      - keycloak
-    networks:
-      - backend
-
-  api-gateway:
-    image: halilibrahimtas/api-gateway
-    ports:
-      - 8181:8181
-    mem_limit: 700m
-    depends_on:
-      - discovery-server
-    networks:
-      - backend
-
-  car-service:
-    image: halilibrahimtas/car-service
-    ports:
-      - 6005:6005
-    mem_limit: 700m
-    depends_on:
-      - discovery-server
-      - api-gateway
-    networks:
-      - backend
-
-  rental-service:
-    image: halilibrahimtas/rental-service
-    ports:
-      - 7005:7005
-    mem_limit: 700m
-    depends_on:
-      - discovery-server
-      - api-gateway
-    networks:
-      - backend
-
   mongo:
     image: mongo:latest
     container_name: mongo
@@ -65,15 +23,27 @@ services:
     networks:
       - backend
 
-  postgresql:
+  postgresql-rentals:
     image: postgres:latest
-    container_name: postgresql
+    container_name: postgresql-rentals
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: rentals
+    networks:
+      - backend
+
+  postgresql-customers:
+    image: postgres:latest
+    container_name: postgresql-customers
+    ports:
+       - "5432:5432"
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: customers
     networks:
       - backend
 

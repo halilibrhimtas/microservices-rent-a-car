@@ -30,6 +30,4 @@ public class CreateCarRequest {
     @NotNull(message = "Daily Price değeri boş olamaz")
     @Min(0)
     private double dailyPrice;
-
-    private List<String> images;
 }

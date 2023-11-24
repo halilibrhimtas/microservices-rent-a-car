@@ -18,5 +18,5 @@ public class UpdateCarResponse {
     private double dailyPrice;
     private String color;
     private String plate;
-    private List<String> images;
+    //private List<String> images;
 }

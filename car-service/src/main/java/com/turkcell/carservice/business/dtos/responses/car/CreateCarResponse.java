@@ -18,5 +18,4 @@ public class CreateCarResponse {
     private double dailyPrice;
     private String color;
     private String plate;
-    private List<String> images;
 }

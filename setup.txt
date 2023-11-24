@@ -260,3 +260,13 @@ rental-service - error:
         <artifactId>cloudinary-http44</artifactId>
         <version>1.27.0</version>
     </dependency>
+
+
+CREATE TABLE customers (
+    id UUID PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    email VARCHAR(255),
+    balance DOUBLE PRECISION,
+    birth_date DATE
+);

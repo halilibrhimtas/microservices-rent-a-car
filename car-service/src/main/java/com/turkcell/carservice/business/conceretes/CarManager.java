@@ -56,8 +56,8 @@ public class CarManager implements CarService {
             Model model = modelRepository.findById(car.getModelId()).orElseThrow();
             brandsBusinessRules.isExistBrand(model.getBrandId());
             Brand brand = brandRepository.findById(model.getBrandId()).orElseThrow();
-            carImagesBusinessRules.isExistCarImages(car.getId());
-            CarImages carImages = getCarImagesByCarId(car.getId());
+            //carImagesBusinessRules.isExistCarImages(car.getId());
+           // CarImages carImages = getCarImagesByCarId(car.getId());
             Boolean isAvailable = webClientBuilder.build()
                     .get()
                     .uri("http://rental-service/api/rentals/check-car-available",
@@ -74,7 +74,7 @@ public class CarManager implements CarService {
                     .plate(car.getPlate())
                     .color(car.getColor())
                     .isAvailable(isAvailable)
-                    .images(carImages.getImages())
+                   //.images(carImages.getImages())
                     .dailyPrice(car.getDailyPrice())
                     .modelYear(car.getModelYear())
                     .build();
@@ -90,7 +90,6 @@ public class CarManager implements CarService {
         brandsBusinessRules.isExistBrand(model.getBrandId());
         Brand brand = brandRepository.findById(model.getBrandId()).orElseThrow();
         carImagesBusinessRules.isExistCarImages(car.getId());
-        CarImages carImages = getCarImagesByCarId(car.getId());
         Boolean isAvailable = webClientBuilder.build()
                 .get()
                 .uri("http://rental-service/api/rentals/check-car-available",
@@ -108,7 +107,6 @@ public class CarManager implements CarService {
                 .plate(car.getPlate())
                 .color(car.getColor())
                 .isAvailable(isAvailable)
-                .images(carImages.getImages())
                 .dailyPrice(car.getDailyPrice())
                 .modelYear(car.getModelYear())
                 .build();
@@ -127,16 +125,14 @@ public class CarManager implements CarService {
                 .dailyPrice(carRequest.getDailyPrice())
                 .build();
         Car createdCAr = carRepository.save(car);
-        String carID = createdCAr.getId();
-        CarImages carImages = saveCarImages(carID, carRequest.getImages());;
         return CreateCarResponse
                 .builder()
                 .id(createdCAr.getId())
                 .color(createdCAr.getColor())
+                .modelId(createdCAr.getModelId())
                 .modelYear(createdCAr.getModelYear())
                 .dailyPrice(createdCAr.getDailyPrice())
                 .plate(createdCAr.getPlate())
-                .images(carImages.getImages())
                 .build();
     }
 
@@ -152,8 +148,6 @@ public class CarManager implements CarService {
                 .dailyPrice(carRequest.getDailyPrice())
                 .build();
         Car createdCAr = carRepository.save(car);
-        String carID = createdCAr.getId();
-        CarImages carImages = updateCarImages(carID, carRequest.getImages());
         return UpdateCarResponse
                 .builder()
                 .id(createdCAr.getId())
@@ -161,7 +155,6 @@ public class CarManager implements CarService {
                 .dailyPrice(createdCAr.getDailyPrice())
                 .plate(createdCAr.getPlate())
                 .modelYear(createdCAr.getModelYear())
-                .images(carImages.getImages())
                 .build();
     }
 
@@ -174,40 +167,6 @@ public class CarManager implements CarService {
     @Override
     public void delete(String id) throws IOException {
         carBusinessRules.isExistCar(id);
-        deleteCarImages(id);
         carRepository.deleteById(id);
     }
-
-    public CarImages saveCarImages(String carId, List<String> images) throws IOException {
-        carImagesBusinessRules.isExistCarImages(carId);
-        List<String> imagesUrlList = new ArrayList<>();
-        for (String image: images) {
-            String imageUrl = cloudinaryUploader.uploadBase64Image(image);
-            imagesUrlList.add(imageUrl);
-        }
-        CarImages carImages = CarImages.builder().carId(carId).images(imagesUrlList).build();
-        return carImagesRepository.save(carImages);
-    }
-
-    public CarImages updateCarImages(String carId, List<String> images) throws IOException {
-        carImagesBusinessRules.isExistCarImages(carId);
-        List<String> imagesUrlList = new ArrayList<>();
-        for (String image: images) {
-            String imageUrl = cloudinaryUploader.uploadBase64Image(image);
-            imagesUrlList.add(imageUrl);
-        }
-        CarImages carImages = CarImages.builder().carId(carId).images(imagesUrlList).build();
-        return carImagesRepository.save(carImages);
-    }
-
-    public void deleteCarImages(String carId) throws IOException {
-        carImagesBusinessRules.isExistCarImages(carId);
-        carImagesRepository.deleteByCarId(carId);
-    }
-
-    CarImages getCarImagesByCarId (String carId) {
-        carImagesBusinessRules.isExistCarImages(carId);
-        return carImagesRepository.findByCarId(carId);
-    }
-
 }

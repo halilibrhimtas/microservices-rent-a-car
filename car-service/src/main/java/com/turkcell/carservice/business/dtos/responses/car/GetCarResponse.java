@@ -23,5 +23,5 @@ public class GetCarResponse {
     private String plate;
     private boolean isAvailable;
     //private String plate;
-    private List<String> images;
+   // private List<String> images;
 }
