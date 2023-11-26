@@ -25,5 +25,5 @@ public class Car {
     private double dailyPrice;
     private String color;
     private String plate;
-    private boolean isAvailable;
+    private boolean available;
 }

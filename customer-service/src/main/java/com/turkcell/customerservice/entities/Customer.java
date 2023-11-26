@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "rentals")
+@Table(name = "customers")
 public class Customer {
 
     @Id
@@ -30,10 +30,8 @@ public class Customer {
     @Column(name = "email")
     private String email;
 
-    /*
     @Column(name = "password")
     private String password;
-    */
 
     @Column(name = "balance")
     private double balance;

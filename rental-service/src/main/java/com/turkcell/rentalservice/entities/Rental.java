@@ -33,4 +33,7 @@ public class Rental {
     @Column(name = "is_rented_completed")
     private boolean isRentedCompleted;
 
+    @Column(name = "customer_id")
+    private UUID customerId;
+
 }

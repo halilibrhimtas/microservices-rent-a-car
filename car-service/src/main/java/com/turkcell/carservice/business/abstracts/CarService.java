@@ -16,5 +16,9 @@ public interface CarService {
     CreateCarResponse add(CreateCarRequest carRequest) throws IOException;
     UpdateCarResponse update(String id, UpdateCarRequest carRequest) throws IOException;
     boolean checkCar(String carId);
+    double getCarPrice(String carId);
     void delete(String id) throws IOException;
+
+    boolean isCarAvilable(String carId);
+    boolean updateCarAvailable(String carId, boolean available);
 }

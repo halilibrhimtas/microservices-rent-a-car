@@ -15,6 +15,7 @@ import java.util.UUID;
 public class UpdateRentalResponse {
     private UUID id;
     private String carId;
+    private UUID customerId;
     private Date startedDate;
     private Date endDate;
     private boolean isRentedCompleted;

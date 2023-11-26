@@ -9,6 +9,7 @@ import com.turkcell.rentalservice.business.dto.response.GetRentalResponse;
 import com.turkcell.rentalservice.business.dto.response.UpdateRentalResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

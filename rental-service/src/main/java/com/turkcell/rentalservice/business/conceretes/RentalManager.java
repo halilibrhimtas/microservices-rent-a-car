@@ -7,12 +7,18 @@ import com.turkcell.rentalservice.business.dto.response.CreateRentalResponse;
 import com.turkcell.rentalservice.business.dto.response.GetAllRentalResponse;
 import com.turkcell.rentalservice.business.dto.response.GetRentalResponse;
 import com.turkcell.rentalservice.business.dto.response.UpdateRentalResponse;
+import com.turkcell.rentalservice.business.exceptions.BusinessException;
 import com.turkcell.rentalservice.business.rules.RentalBusinessRules;
 import com.turkcell.rentalservice.entities.Rental;
 import com.turkcell.rentalservice.repository.RentalRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +29,10 @@ public class RentalManager implements RentalService {
 
     private final RentalRepository rentalRepository;
     private final ModelMapper modelMapper;
+    private final MessageSource messageSource;
+    private final WebClient.Builder webClientBuilder;
     private final RentalBusinessRules rentalBusinessRules;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Override
     public List<GetAllRentalResponse> getAll() {
@@ -41,14 +50,55 @@ public class RentalManager implements RentalService {
     @Override
     public CreateRentalResponse add(CreateRentalRequest request) {
         rentalBusinessRules.isExistCar(request.getCarId());
-        Rental rental = Rental.builder()
-                .carId(request.getCarId())
-                .startedDate(request.getStartedDate())
-                .endDate(request.getEndDate())
-                .isRentedCompleted(request.isRentedCompleted())
-                .build();
-        rentalRepository.save(rental);
-        return modelMapper.map(rental, CreateRentalResponse.class);
+        rentalBusinessRules.isCarAvailable(request.getCarId());
+        rentalBusinessRules.isTheBalanceEnoughForTheCar(request.getCarId(), request.getCustomerId());
+        Double carDailyPrice = webClientBuilder.build()
+                .get()
+                .uri("http://car-service/api/cars/getCarPrice",
+                        (uriBuilder) -> uriBuilder
+                                .queryParam("id", request.getCarId()).build())
+                .retrieve()
+                .bodyToMono(Double.class)
+                .block();
+        Double balance = webClientBuilder.build()
+                .get()
+                .uri("http://customer-service/api/customers/getBalance",
+                        (uriBuilder) -> uriBuilder
+                                .queryParam("id", request.getCustomerId()).build())
+                .retrieve()
+                .bodyToMono(Double.class)
+                .block();
+        if(balance >= carDailyPrice) {
+            Rental rental = Rental.builder()
+                    .carId(request.getCarId())
+                    .customerId(request.getCustomerId())
+                    .startedDate(request.getStartedDate())
+                    .endDate(request.getEndDate())
+                    .isRentedCompleted(request.isRentedCompleted())
+                    .build();
+            rentalRepository.save(rental);
+            kafkaTemplate.send("rental-topic", "Kiralama işlemi başarılı...");
+            double newBalance = balance - carDailyPrice;
+            webClientBuilder.build().put()
+                    .uri("http://customer-service/api/customers/updateBalance", (uriBuilder ->
+                            uriBuilder
+                                    .queryParam("id", request.getCustomerId())
+                                    .queryParam("balance", newBalance)
+                                    .build())).retrieve().bodyToMono(Double.class).block();
+            webClientBuilder.build()
+                    .put()
+                    .uri("http://car-service/api/cars/updateAvailable",
+                            (uriBuilder) -> uriBuilder
+                                    .queryParam("id", request.getCarId())
+                                    .queryParam("available", false)
+                                    .build())
+                    .retrieve()
+                    .bodyToMono(Boolean.class)
+                    .block();
+            return modelMapper.map(rental, CreateRentalResponse.class);
+        } else {
+            throw new BusinessException(messageSource.getMessage("isTheBalanceEnoughForTheCar", new Object[] {}, LocaleContextHolder.getLocale()));
+        }
     }
 
     @Override

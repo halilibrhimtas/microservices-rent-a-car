@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,6 +20,9 @@ import java.util.Date;
 public class UpdateRentalRequest {
     @NotBlank
     private String carId;
+
+    @NotBlank
+    private UUID customerId;
 
     // Tarih formatı: dd-mm-yyyy
     @Pattern(regexp = Regex.DATE_REGEX)

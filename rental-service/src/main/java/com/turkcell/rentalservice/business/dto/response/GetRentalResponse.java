@@ -16,6 +16,7 @@ public class GetRentalResponse {
     private UUID id;
     private String carId;
     private Date startedDate;
+    private UUID customerId;
     private Date endDate;
     private boolean isRentedCompleted;
 }

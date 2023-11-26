@@ -204,6 +204,7 @@
 CREATE TABLE rentals (
     id UUID PRIMARY KEY,
     car_id VARCHAR(255) NOT NULL,
+    customer_id UUID
     started_date TIMESTAMP NOT NULL,
     end_date TIMESTAMP NOT NULL,
     is_rented_completed BOOLEAN NOT NULL
@@ -267,6 +268,7 @@ CREATE TABLE customers (
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     email VARCHAR(255),
+    password VARCHAR(255),
     balance DOUBLE PRECISION,
     birth_date DATE
 );

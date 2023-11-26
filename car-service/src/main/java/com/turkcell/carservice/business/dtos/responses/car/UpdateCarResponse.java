@@ -18,5 +18,6 @@ public class UpdateCarResponse {
     private double dailyPrice;
     private String color;
     private String plate;
+    private boolean available;
     //private List<String> images;
 }

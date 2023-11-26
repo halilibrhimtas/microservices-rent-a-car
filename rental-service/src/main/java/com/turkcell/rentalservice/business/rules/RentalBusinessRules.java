@@ -39,4 +39,43 @@ public class RentalBusinessRules {
             throw new BusinessException(messageSource.getMessage("isExistCar", new Object[] {carId}, LocaleContextHolder.getLocale()));
         }
     }
+
+    public void isTheBalanceEnoughForTheCar(String carId, UUID customerId) {
+        Double carPrice = webClientBuilder.build()
+                .get()
+                .uri("http://car-service/api/cars/getCarPrice",
+                        (uriBuilder) -> uriBuilder
+                                .queryParam("id", carId).build())
+                .retrieve()
+                .bodyToMono(Double.class)
+                .block();
+        Double balance = webClientBuilder.build()
+                .get()
+                .uri("http://customer-service/api/customers/getBalance",
+                        (uriBuilder) -> uriBuilder
+                                .queryParam("id", customerId).build())
+                .retrieve()
+                .bodyToMono(Double.class)
+                .block();
+
+        if(carPrice > balance) {
+            throw new BusinessException(messageSource.getMessage("isTheBalanceEnoughForTheCar", new Object[] {}, LocaleContextHolder.getLocale()));
+        }
+    }
+
+    public void isCarAvailable(String carId) {
+        Boolean isAvailable = webClientBuilder.build()
+                .get()
+                .uri("http://car-service/api/cars/isCarAvailable",
+                        (uriBuilder) -> uriBuilder
+                                .queryParam("id", carId).build())
+                .retrieve()
+                .bodyToMono(Boolean.class)
+                .block();
+
+        if(!isAvailable) {
+            throw new BusinessException(messageSource.getMessage("isCarAvailable", new Object[] {carId}, LocaleContextHolder.getLocale()));
+
+        }
+    }
 }

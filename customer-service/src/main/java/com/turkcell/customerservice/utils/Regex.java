@@ -1,6 +1,6 @@
 package com.turkcell.customerservice.utils;
 
 public class Regex {
-    public static final String Plate = "^(0[1-9]|[1-7][0-9]|8[01])(([A-Z])(\\d{4,5}) | ([A-Z]{2})(\\d{3,4}) | ([A-Z]{3})(\\d{2}))$";
+    public static final String Email = "^[a-zA-Z0-9_+&*-]+(?:\\\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\\\.)+[a-zA-Z]{2,7}$";
 
 }

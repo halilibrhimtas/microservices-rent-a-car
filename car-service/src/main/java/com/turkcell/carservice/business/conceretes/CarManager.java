@@ -1,8 +1,6 @@
 package com.turkcell.carservice.business.conceretes;
 
 import com.turkcell.carservice.business.abstracts.CarService;
-import com.turkcell.carservice.business.dtos.requests.carImages.CreateCarImagesRequest;
-import com.turkcell.carservice.business.dtos.requests.carImages.UpdateCarImagesRequest;
 import com.turkcell.carservice.business.rules.BrandsBusinessRules;
 import com.turkcell.carservice.business.rules.CarBusinessRules;
 import com.turkcell.carservice.business.rules.CarImagesBusinessRules;
@@ -28,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,8 +40,6 @@ public class CarManager implements CarService {
     private final ModelBusinessRules modelBusinessRules;
     private final CarBusinessRules carBusinessRules;
     private final WebClient.Builder webClientBuilder;
-    private final CloudinaryUploader cloudinaryUploader;
-    private final CarImagesRepository carImagesRepository;
     private final CarImagesBusinessRules carImagesBusinessRules;
     private final BrandsBusinessRules brandsBusinessRules;
 
@@ -58,14 +53,6 @@ public class CarManager implements CarService {
             Brand brand = brandRepository.findById(model.getBrandId()).orElseThrow();
             //carImagesBusinessRules.isExistCarImages(car.getId());
            // CarImages carImages = getCarImagesByCarId(car.getId());
-            Boolean isAvailable = webClientBuilder.build()
-                    .get()
-                    .uri("http://rental-service/api/rentals/check-car-available",
-                            (uriBuilder) -> uriBuilder
-                                    .queryParam("carId", car.getId()).build())
-                    .retrieve()
-                    .bodyToMono(Boolean.class)
-                    .block();
             return GetAllCarResponse
                     .builder()
                     .id(car.getId())
@@ -73,7 +60,7 @@ public class CarManager implements CarService {
                     .model(model)
                     .plate(car.getPlate())
                     .color(car.getColor())
-                    .isAvailable(isAvailable)
+                    .available(car.isAvailable())
                    //.images(carImages.getImages())
                     .dailyPrice(car.getDailyPrice())
                     .modelYear(car.getModelYear())
@@ -106,7 +93,7 @@ public class CarManager implements CarService {
                 .model(model)
                 .plate(car.getPlate())
                 .color(car.getColor())
-                .isAvailable(isAvailable)
+                .available(isAvailable)
                 .dailyPrice(car.getDailyPrice())
                 .modelYear(car.getModelYear())
                 .build();
@@ -123,6 +110,7 @@ public class CarManager implements CarService {
                 .color(carRequest.getColor())
                 .plate(carRequest.getPlate())
                 .dailyPrice(carRequest.getDailyPrice())
+                .available(true)
                 .build();
         Car createdCAr = carRepository.save(car);
         return CreateCarResponse
@@ -131,6 +119,7 @@ public class CarManager implements CarService {
                 .color(createdCAr.getColor())
                 .modelId(createdCAr.getModelId())
                 .modelYear(createdCAr.getModelYear())
+                .available(createdCAr.isAvailable())
                 .dailyPrice(createdCAr.getDailyPrice())
                 .plate(createdCAr.getPlate())
                 .build();
@@ -145,6 +134,7 @@ public class CarManager implements CarService {
                 .modelYear(carRequest.getModelYear())
                 .color(carRequest.getColor())
                 .plate(carRequest.getPlate())
+                .available(carRequest.isAvailable())
                 .dailyPrice(carRequest.getDailyPrice())
                 .build();
         Car createdCAr = carRepository.save(car);
@@ -154,6 +144,7 @@ public class CarManager implements CarService {
                 .color(createdCAr.getColor())
                 .dailyPrice(createdCAr.getDailyPrice())
                 .plate(createdCAr.getPlate())
+                .available(createdCAr.isAvailable())
                 .modelYear(createdCAr.getModelYear())
                 .build();
     }
@@ -164,9 +155,31 @@ public class CarManager implements CarService {
         return car.isPresent();
     }
 
+
+    @Override
+    public double getCarPrice(String carId) {
+        carBusinessRules.isExistCar(carId);
+        Car car = carRepository.findById(carId).orElseThrow();
+        return car.getDailyPrice();
+    }
+
     @Override
     public void delete(String id) throws IOException {
         carBusinessRules.isExistCar(id);
         carRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean isCarAvilable(String carId) {
+        GetCarResponse getCarResponse = getById(carId);
+        return getCarResponse.isAvailable();
+    }
+
+    @Override
+    public boolean updateCarAvailable(String carId, boolean available) {
+        Car car = carRepository.findById(carId).orElseThrow();
+        car.setAvailable(available);
+        carRepository.save(car);
+        return available;
     }
 }

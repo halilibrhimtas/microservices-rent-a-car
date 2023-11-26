@@ -21,7 +21,7 @@ public class GetAllCarResponse {
     private double dailyPrice;
     private String color;
     private String plate;
-    private boolean isAvailable;
+    private boolean available;
     //private List<String> images;
     //private List<String> imagesUrls;
 }

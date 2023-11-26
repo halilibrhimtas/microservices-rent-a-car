@@ -32,6 +32,7 @@ public class CarsController {
         return carService.getById(id);
     }
 
+
     /*
     @GetMapping("/{id}")
     public GetBrandResponse getById(@PathVariable UUID uuid) {
@@ -50,6 +51,20 @@ public class CarsController {
     @GetMapping("/check-car")
     public Boolean checkCar(@RequestParam("id") String carId) {
         return carService.checkCar(carId);
+    }
+
+    @GetMapping("/getCarPrice")
+    public double getCarPrice(@RequestParam("id") String id) {
+        return carService.getCarPrice(id);
+    }
+    @GetMapping("/isCarAvailable")
+    public boolean isCarAvailable(@RequestParam("id") String id) {
+        return carService.isCarAvilable(id);
+    }
+
+    @PutMapping("/updateAvailable")
+    public boolean updateAvailable(@RequestParam("id") String id, @RequestParam("available") boolean available) {
+        return carService.updateCarAvailable(id, available);
     }
     @DeleteMapping("/delete")
     public void delete(@RequestParam("id") String id) throws IOException {

@@ -35,4 +35,7 @@ public class UpdateCarRequest {
 
     @Pattern(regexp = Regex.Plate, message = "Türkiye plakası olmalıdır.")
     private String plate;
+
+    private boolean available;
+
 }
