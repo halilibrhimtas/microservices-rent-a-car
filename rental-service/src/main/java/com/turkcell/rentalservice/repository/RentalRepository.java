@@ -10,6 +10,6 @@ import java.util.UUID;
 
 public interface RentalRepository extends JpaRepository<Rental, UUID> {
 
-    @Query("SELECT r FROM Rental r WHERE r.isRentedCompleted = true AND r.carId = :carId")
-    List<Rental> findCompletedRentalsByCarId(@Param("carId") String carId);
+    @Query("SELECT r FROM Rental r WHERE r.isRentalProcessContinue = true AND r.carId = :carId")
+    List<Rental> findContinueRentalsByCarId(@Param("carId") String carId);
 }

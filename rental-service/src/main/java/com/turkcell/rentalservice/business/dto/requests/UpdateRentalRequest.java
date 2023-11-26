@@ -34,5 +34,5 @@ public class UpdateRentalRequest {
     private Date endDate;
 
     @NotNull
-    private boolean isRentedCompleted;
+    private boolean isRentalProcessContinue;
 }

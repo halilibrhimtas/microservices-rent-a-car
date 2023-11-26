@@ -18,5 +18,5 @@ public class GetRentalResponse {
     private Date startedDate;
     private UUID customerId;
     private Date endDate;
-    private boolean isRentedCompleted;
+    private boolean isRentalProcessContinue;
 }

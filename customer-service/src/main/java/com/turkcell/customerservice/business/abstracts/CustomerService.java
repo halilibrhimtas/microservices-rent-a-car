@@ -19,6 +19,5 @@ public interface CustomerService {
     UpdateCustomerResponse update(UUID id, UpdateCustomerRequest updateCustomerRequest);
     void delete(UUID id);
     double getBalance(UUID id);
-
     double updateBalance(UUID id, double balance);
 }

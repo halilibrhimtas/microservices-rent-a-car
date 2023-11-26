@@ -74,10 +74,17 @@ public class RentalManager implements RentalService {
                     .customerId(request.getCustomerId())
                     .startedDate(request.getStartedDate())
                     .endDate(request.getEndDate())
-                    .isRentedCompleted(request.isRentedCompleted())
+                    .isRentalProcessContinue(request.isRentalProcessContinue())
                     .build();
             rentalRepository.save(rental);
-            kafkaTemplate.send("rental-topic", "Kiralama işlemi başarılı...");
+            String message = String.format("Kiralama işlemi başarıyla gerçekleşmiştir.%n" +
+                            "Müşteri ID: %s%n" +
+                            "Araba ID: %s%n" +
+                            "Kiralama Fiyatı: %.2f%n" +
+                            "Başlangıç Tarihi: %s%n" +
+                            "Bitiş Tarihi: %s%n",
+                    request.getCustomerId().toString(), request.getCarId(), carDailyPrice, request.getStartedDate(), request.getEndDate());
+            kafkaTemplate.send("rental-topic", message);
             double newBalance = balance - carDailyPrice;
             webClientBuilder.build().put()
                     .uri("http://customer-service/api/customers/updateBalance", (uriBuilder ->
@@ -109,7 +116,7 @@ public class RentalManager implements RentalService {
                 .carId(request.getCarId())
                 .startedDate(request.getStartedDate())
                 .endDate(request.getEndDate())
-                .isRentedCompleted(request.isRentedCompleted())
+                .isRentalProcessContinue(request.isRentalProcessContinue())
                 .build();
         rentalRepository.save(rental);
         return modelMapper.map(rental, UpdateRentalResponse.class);
@@ -117,7 +124,7 @@ public class RentalManager implements RentalService {
 
     @Override
     public Boolean checkCarAvailable(String carId) {
-        List<Rental> rentals = rentalRepository.findCompletedRentalsByCarId(carId);
+        List<Rental> rentals = rentalRepository.findContinueRentalsByCarId(carId);
         return rentals.isEmpty();
     }
 

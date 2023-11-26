@@ -30,8 +30,8 @@ public class Rental {
     @Column(name = "end_date")
     private Date endDate;
 
-    @Column(name = "is_rented_completed")
-    private boolean isRentedCompleted;
+    @Column(name = "is_rental_process_continue")
+    private boolean isRentalProcessContinue;
 
     @Column(name = "customer_id")
     private UUID customerId;

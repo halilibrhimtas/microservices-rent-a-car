@@ -7,6 +7,7 @@ import com.turkcell.customerservice.business.dtos.responses.CreateCustomerRespon
 import com.turkcell.customerservice.business.dtos.responses.GetAllCustomerResponse;
 import com.turkcell.customerservice.business.dtos.responses.GetCustomerResponse;
 import com.turkcell.customerservice.business.dtos.responses.UpdateCustomerResponse;
+import com.turkcell.customerservice.business.rules.CustomerBusinessRules;
 import com.turkcell.customerservice.entities.Customer;
 import com.turkcell.customerservice.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class CustomerManager implements CustomerService {
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
+    private final CustomerBusinessRules customerBusinessRules;
     @Override
     public List<GetAllCustomerResponse> getAll() {
         List<Customer> customers = customerRepository.findAll();
@@ -53,6 +55,7 @@ public class CustomerManager implements CustomerService {
 
     @Override
     public CreateCustomerResponse add(CreateCustomerRequest createCustomerRequest) {
+        customerBusinessRules.isItAgeAppropriateToRentACar(createCustomerRequest.getBirthDate());
         Customer customer = Customer
                 .builder()
                 .firstName(createCustomerRequest.getFirstName())

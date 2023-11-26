@@ -207,7 +207,7 @@ CREATE TABLE rentals (
     customer_id UUID
     started_date TIMESTAMP NOT NULL,
     end_date TIMESTAMP NOT NULL,
-    is_rented_completed BOOLEAN NOT NULL
+    is_rental_process_continue BOOLEAN NOT NULL
 );
 
 
