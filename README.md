@@ -46,7 +46,7 @@ Her servisi başlatmak için aşağıdaki adımları takip edin.
 2. **Install Package**
     - Projenin olduğu klasörde `mvn clean install` komutunu çalıştırın.
 
-3. **Docker*
+3. **Docker**
     - Projeyi Docker'da çalıştırmak için öncelikle yüklemeliyiz. `docker-compose up -d`
     - Projeyi durdurmak için `docker-compose stop`, tekrar başlatmak için `docker-compose start`, Docker'dan kaldırmak için `docker-compose down`
 
