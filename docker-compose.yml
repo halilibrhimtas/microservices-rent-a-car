@@ -13,7 +13,7 @@ services:
       - backend
 
   discovery-server:
-    image: halilibrahimtas/discovery-server
+    build: ./discovery-server
     ports:
       - "8761:8761"
     mem_limit: 700m
@@ -74,6 +74,67 @@ services:
       ZK_HOSTS: zookeeper:2181
     depends_on:
       - kafka
+
+  customer-service:
+    build: ./customer-service
+    ports:
+      - "7001:7001"
+    mem_limit: 700m
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://localhost:8761/eureka
+    depends_on:
+      - discovery-server
+      - api-gateway
+    networks:
+      - currency-network
+
+  rental-service:
+    build: ./rental-service
+    ports:
+      - "7002:7002"
+    mem_limit: 700m
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://localhost:8761/eureka
+    depends_on:
+      - discovery-server
+      - api-gateway
+      - notification-service
+    networks:
+      - currency-network
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "7003:7003"
+    mem_limit: 700m
+    depends_on:
+      - kafka
+    networks:
+      - currency-network
+
+  car-service:
+    build: ./car-service
+    ports:
+      - "7004:7004"
+    mem_limit: 700m
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://localhost:8761/eureka
+    depends_on:
+      - discovery-server
+      - api-gateway
+    networks:
+      - currency-network
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8181:8181"
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://localhost:8761/eureka
+    depends_on:
+      - discovery-server
+    networks:
+      - currency-network
 
 networks:
   backend:

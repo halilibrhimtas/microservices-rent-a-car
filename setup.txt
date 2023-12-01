@@ -1,4 +1,4 @@
-    --- DISCOVERY SERVER--- pom.xml
+   --- DISCOVERY SERVER--- pom.xml
 
    Bu bağımlılık, Netflix tarafından geliştirilen Eureka isimli bir hizmet keşif (service discovery)
     sunucusunu entegre etmenizi sağlar.Eureka Server, bir servisin kaydedildiği (register) ve başka bir

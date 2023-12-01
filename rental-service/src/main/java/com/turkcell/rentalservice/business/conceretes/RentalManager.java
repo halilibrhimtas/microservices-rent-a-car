@@ -49,9 +49,13 @@ public class RentalManager implements RentalService {
 
     @Override
     public CreateRentalResponse add(CreateRentalRequest request) {
+
+        //rules
         rentalBusinessRules.isExistCar(request.getCarId());
         rentalBusinessRules.isCarAvailable(request.getCarId());
         rentalBusinessRules.isTheBalanceEnoughForTheCar(request.getCarId(), request.getCustomerId());
+
+        // sync communication - get data
         Double carDailyPrice = webClientBuilder.build()
                 .get()
                 .uri("http://car-service/api/cars/getCarPrice",
@@ -77,6 +81,8 @@ public class RentalManager implements RentalService {
                     .isRentalProcessContinue(request.isRentalProcessContinue())
                     .build();
             rentalRepository.save(rental);
+
+            // kafka send massages
             String message = String.format("Kiralama işlemi başarıyla gerçekleşmiştir.%n" +
                             "Müşteri ID: %s%n" +
                             "Araba ID: %s%n" +
@@ -86,6 +92,8 @@ public class RentalManager implements RentalService {
                     request.getCustomerId().toString(), request.getCarId(), carDailyPrice, request.getStartedDate(), request.getEndDate());
             kafkaTemplate.send("rental-topic", message);
             double newBalance = balance - carDailyPrice;
+
+            // sync communication - send data
             webClientBuilder.build().put()
                     .uri("http://customer-service/api/customers/updateBalance", (uriBuilder ->
                             uriBuilder
