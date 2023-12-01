@@ -56,5 +56,8 @@ Her servisi başlatmak için aşağıdaki adımları takip edin.
   - [Video 3](https://vimeo.com/888511359/a643a218e3?share=copy)
     
 ## Project Schemas
-  <img src="https://github.com/halilibrhimtas/microservices-rent-a-car/assets/74383996/7b44a495-08f0-4df5-94c3-2343a558ee10" height=400><br>
+  **UML DIAGRAM**
+  <img src="https://github.com/halilibrhimtas/microservices-rent-a-car/assets/74383996/7b44a495-08f0-4df5-94c3-2343a558ee10"><br>
+
+  **PROJECT STRUCTURE**
   <img src="https://github.com/halilibrhimtas/rent-a-car-microservices/assets/74383996/53db5454-3ad5-4c01-930d-f21b2c57f060"><br>
