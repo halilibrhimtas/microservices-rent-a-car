@@ -34,7 +34,7 @@ Bu proje, bir araç kiralama işi için mikroservis mimarisini kullanarak geliş
 
 6. **Api Gateway**
    - Harici talepleri yönlendiren ve iç servislere ileten API Gateway.
-   - Authorization tipi OAuth 2.0 kullanılıyor. Keycloak üzerinden client oluşturularak, `localhost:8181` url'i üzerinden istekler göndermek için JWT token oluşturulur.
+   - OAuth 2.0 tipinde Authorization kullanılmaktadır. Keycloak üzerinden client oluşturularak, `localhost:8181` url'i üzerinden istekler göndermek için JWT token oluşturulur.
 
 ## Installation
 
