@@ -1,54 +1,54 @@
 # RENT A CAR MICROSERVICES
 
-Bu proje, bir araç kiralama işi için mikroservis mimarisini kullanarak geliştirilmiştir. Proje, Spring Boot ve Spring Cloud framework'lerini kullanarak Customer Service, Car Service, Rental Service, Notification Service, Discovery Server ve Api Gateway mikroservislerini içermektedir.
+This project has been developed using a microservices architecture for a car rental business. The project includes microservices for Customer Service, Car Service, Rental Service, Notification Service, Discovery Server, and Api Gateway, utilizing Spring Boot and Spring Cloud frameworks.
 
-## Mikroservisler
+## Microservices
 
 1. **Customer Service**
-   - Müşteri verilerini yönetir.
-   - RESTful API üzerinden müşteri bilgileri için CRUD işlemlerinin yapılmasını sağlar.
-   - Müşterinin adı, soyadı, email adresi, şifresi, doğum tarihi bilgileri istenir ve bakiye bilgisi takip edilir.
-   - Veritabanı olarak PostgreSQL kullanılır.
+   - Manages customer data.
+   - Enables CRUD operations for customer information via RESTful API.
+   - Collects customer information such as name, surname, email address, password, birthdate, and tracks the balance.
+   - Uses PostgreSQL as the database.
 
 2. **Car Service**
-   - Araç bilgilerini yönetir.
-   - Araç bilgileri için her aracın bir modeli, her modelin ise bir markası olacak şekilde oluşturulur. Aracın plakası, ücreti, model yılı, rengi ve kullanılabilirliği bilgileri takip edilir. Araç plakası için Türkiye standartlarına uygun olması için Regex mevcuttur.
-   - Araba resimleri kullanıcıdan alınır ve Cloudinary bulut sisteminde tutulur. Kullanıcının fotoğrafları yüklemesi için thymeleaf kütüphanesi ile arayüz oluşturulmuştur.
-   - Araba, araba resimleri, model ve marka için MongoDB veritabanında ayrı ayrı collection olarak tutulmaktadır.
+   - Manages vehicle information.
+   - Establishes a model for each vehicle, with each model having a brand. Tracks the license plate, fee, model year, color, and availability information for each vehicle. Utilizes Regex for license plates to comply with Turkiye standards.
+   - Captures car images from users and stores them in the Cloudinary cloud system. A user interface for uploading photos is created using the Thymeleaf library.
+   - Stores information for cars, car images, models, and brands as separate collections in the MongoDB database.
     
 3. **Rental Service**
-   - Kiralama işlemlerini yönetir.
-   - Araç kiralama işlemi için araba id'si ve müşteri id'si bilgileri alınır. Kiralama sürecinin başlangıç, bitiş tarihi ve kiralama durumu takip edilir.
-   - Car Service ve Customer Service ile senkron bir iletişim halinde olup aracın müsaitliği, günlük ücreti ve kiralama için müşteri bakiyesi bilgileri takip edilmektedir.
-   - Senkron iletişim için Web Client kullanılmaktadır. Web Client, senkron/asenkron olarak çalışan, web tabanlı servislerle etkileşimde bulunmak için kullanılan bir HTTP istemcisidir.
-   - Kiralama işlemi gerçekleştiğinde Notification Service ile asenkron iletişim halinde kiralama bilgilerini mail formatında(rentalTopic) gönderilmektedir. Bu iletişim için Kafka kullanılmaktadır(RabbitMQ ile aynı işleve sahip). 
-   - Veritabanı olarak PostgreSQL kullanılır.
+   - Manages rental operations.
+   - Collects car ID and customer ID for the car rental process. Tracks the start and end date of the rental process and the rental status.
+   - Communicates synchronously with Car Service and Customer Service to track the availability of the car, daily rate, and customer balance for rental.
+   - Uses Web Client for synchronous communication. Web Client is an HTTP client used to interact with web-based services that operate synchronously/asynchronously.
+   - When the rental process is completed, it communicates asynchronously with the Notification Service to send rental information in mail format (rentalTopic). Kafka is used for this communication (similar function to RabbitMQ). 
+   - Uses PostgreSQL as the database.
 
 4. **Notification Service**
-   - Kullanıcılara bildirim gönderme işlemlerini yönetir.
-   - Kiralama durumu güncellemeleri ve diğer önemli bildirimleri sağlar.
-   - Async iletişim için Kafka'yı kullanmaktadır.
+   - Manages notification processes to send notifications to users.
+   - Provides updates on rental status and other important notifications.
+   - Utilizes Kafka for asynchronous communication.
 
 5. **Discovery Server**
-   - Servislerin dinamik olarak bulunmasını ve bağlanmasını sağlayan Eureka tabanlı keşif sunucusudur.
+   - Eureka-based discovery server that enables dynamic discovery and connection of services.
 
 6. **Api Gateway**
-   - Harici talepleri yönlendiren ve iç servislere ileten API Gateway.
-   - OAuth 2.0 tipinde Authorization kullanılmaktadır. Keycloak üzerinden client oluşturularak, `localhost:8181` url'i üzerinden istekler göndermek için JWT token oluşturulur.
+   - API Gateway that directs and forwards external requests to internal services.
+   - Uses OAuth 2.0 type of Authorization. JWT tokens are created through Keycloak by creating a client to send requests via the `localhost:8181` URL.
 
 ## Installation
 
-Her servisi başlatmak için aşağıdaki adımları takip edin.
+Follow the steps below to start each service.
 
-1. **Projeyi Kopyalayın**
+1. **Clone the Project**
    - `git clone https://github.com/username/ai-customer-support-chatbot.git cd microservices-rent-a-car`
 
-2. **Install Package**
-    - Projenin olduğu klasörde `mvn clean install` komutunu çalıştırın.
+2. **Install Package** 
+    - Run the `mvn clean install` command in the project folder.
 
 3. **Docker**
-    - Projeyi Docker'da çalıştırmak için öncelikle yüklemeliyiz. `docker-compose up -d`
-    - Projeyi durdurmak için `docker-compose stop`, tekrar başlatmak için `docker-compose start`, Docker'dan kaldırmak için `docker-compose down`
+    - To run the project in Docker, you must first install it. `docker-compose up -d`
+    - To stop the project, use `docker-compose stop`, to start it again use `docker-compose start`, to remove it from Docker use `docker-compose down`
 
 ## Video
   - [Video 1](https://vimeo.com/manage/videos/887836060/839fd8a31c)
@@ -62,5 +62,5 @@ Her servisi başlatmak için aşağıdaki adımları takip edin.
   **PROJECT STRUCTURE**
   <img src="https://github.com/halilibrhimtas/rent-a-car-microservices/assets/74383996/53db5454-3ad5-4c01-930d-f21b2c57f060"><br>
 
-## Sosyal Medya
+## Social Media
   - [Linkedin](https://www.linkedin.com/in/halilibrhimtas)
